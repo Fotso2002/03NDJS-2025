@@ -1,7 +1,7 @@
-const math = require('./math.js');
+const math1 = require('./math.js');
 
 // Example usage
-const sum = math.sum(5, 7);
+const sum = math1.sum(5, 7);
 console.log(`The sum is: ${sum}`);
 const diff = math.diff(10, 4);
 console.log(`The difference is: ${diff}`);
