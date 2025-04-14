@@ -1,0 +1,5 @@
+Today we having the introduction ton NodeJS
+We started with Installation of the enviroment that is; NdeJS, NPM etc
+We saw the declaration of variables that is the declaration of contstant variables, variables that may change started
+We saw the declaration of objects
+we saw the declaration of objects with arrays
