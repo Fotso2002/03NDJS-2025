@@ -1,0 +1,13 @@
+Understanding the asynchronous nature of NodeJS
+There are two ways to rceive information ; either a callback or promise
+Understsandng the a callback function:
+   A callback is a function that passed an argument executed later after an asyn operation finishes
+Promises:
+   It's is another way to get information but the differnt with callback is that it's first catch the succesful data
+   before displaying any error which is the exact oppositin of a callback
+Exo   
+   Extrait sur cette url dans le tableau
+   le nom du jouer la Moyenne,joues, point
+   LF, 2Pts et 3Pts.Ici nous utilisons la 
+   technologie cheerio avec nodejs nous avons deja
+   initialiser le projet nodejs dans notre ide
