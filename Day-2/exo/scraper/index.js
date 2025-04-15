@@ -65,6 +65,7 @@ async function saveTournamentsToFile(tournaments) {
 }
 
 // Exécution
-(async () => {
+async function main() {
     await extractATPTournaments2025();
-})();
+  }
+  main();
