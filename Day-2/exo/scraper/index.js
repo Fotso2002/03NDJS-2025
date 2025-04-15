@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 async function extractATPTournaments2025() {
     try {
@@ -34,7 +35,7 @@ async function extractATPTournaments2025() {
             }
         });
 
-        // 4. Sauvegarde dans un fichier JSON
+        // 4. Sauvegarde dans un fichier JSON à l'emplacement spécifié
         await saveTournamentsToFile(tournaments);
         
         console.log('Tournois ATP 2025 extraits et sauvegardés avec succès!');
@@ -48,14 +49,18 @@ async function extractATPTournaments2025() {
 
 async function saveTournamentsToFile(tournaments) {
     try {
+        // Chemin absolu vers le répertoire cible
+        const targetDirectory = 'C:\\Users\\franc\\Bureau\\IT\\Courses\\3NJS\\03NDJS-2025\\Day-2\\exo\\scraper';
         const fileName = 'tournois_atp_2025.json';
+        const filePath = join(targetDirectory, fileName);
+        
         const jsonData = JSON.stringify(tournaments, null, 2); // Formatage lisible
         
-        await writeFile(fileName, jsonData, 'utf-8');
-        console.log(`Données sauvegardées dans ${fileName}`);
+        await writeFile(filePath, jsonData, 'utf-8');
+        console.log(`Données sauvegardées dans ${filePath}`);
     } catch (err) {
         console.error('Erreur lors de la sauvegarde:', err);
-        throw err; // Propage l'erreur
+        throw err;
     }
 }
 
