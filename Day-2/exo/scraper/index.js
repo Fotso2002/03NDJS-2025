@@ -62,9 +62,9 @@ async function sauvegarderTournois(donnees) {
         const contenuJSON = JSON.stringify(donnees, null, 2);
         await fs.promises.writeFile(cheminFichier, contenuJSON, 'utf-8');
         console.log(`Fichier enregistré : ${cheminFichier}`);
-    } catch (e) {
-        console.error('Échec lors de l’écriture du fichier :', e);
-        throw e;
+    } catch (Error) {
+        console.error('Échec lors de l’écriture du fichier :', Error);
+        throw Error;
     }
 }
 
