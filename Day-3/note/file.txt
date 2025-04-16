@@ -1,0 +1,19 @@
+Objectives
+ Create a structure RESTFUL API using Express.js 
+  A RESTFUL API is a server that permit us to to make a CRUD
+   Express.js skilss;
+      RESTful APIs. Express.js is widely used to design scalable, 
+      production-ready RESTful APIs. The framework's routing and middleware 
+      capabilities make it easy to define API endpoints, handle HTTP methods 
+      (GET, POST, PUT, and DELETE), parse request bodies, and return JSON responses.
+         starting a mongoose db command;
+         "nmp init -y" to start the nodejs project
+         "npm install mongoose" to initialise the package for the db
+         "npm install express" to install express framework
+         next we create a folder db, then inside db we create a file connectDB.js
+         next create a folder at the root of the project "models" the a file Users.js for our entities
+         next create a folder at the root of the project for route called routes and then create a file auth.js
+          This folderis used for creation of path: Router = Path 
+         next is the creation of the folder controller then a file auth.js for the registration of the Users
+          next is for the login still in the folder controllers (What is an envirmoment variable) 
+         creation of the server.js
