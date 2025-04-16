@@ -1,69 +1,75 @@
 import * as cheerio from 'cheerio';
-import fs from 'fs';  // Import classique 
+import fs from 'fs';
 
-async function extractATPTournaments2025() {
+// Fonction principale pour extraire les tournois ATP 2025
+async function collectTournoisATP2025() {
     try {
-        // 1. Récupération des données depuis Wikipedia
         const $ = await cheerio.fromURL('https://fr.wikipedia.org/wiki/Saison_2025_de_l%27ATP');
 
-        // 2. Localisation du tableau des résultats
-        const tables = $('table.wikitable');
-        if (tables.length < 2) {
-            throw new Error('Tableau non trouvé');
+        const tableaux = $('table.wikitable');
+        if (tableaux.length < 2) {
+            throw new Error('Deuxième tableau introuvable sur la page');
         }
-        const resultsTable = $(tables[1]);
 
-        // 3. Extraction des données
-        const tournaments = [];
-        
-        resultsTable.find('tbody tr').slice(1).each((i, row) => {
-            const cols = $(row).find('td');
-            
-            if (cols.length >= 8) {
-                tournaments.push({
-                    numero: $(cols[0]).text().trim(),
-                    date: $(cols[1]).text().trim(),
-                    nomEtLieu: $(cols[2]).text().trim(),
-                    categorie: $(cols[3]).text().trim(),
-                    surface: $(cols[4]).text().trim(),
-                    dotation: $(cols[5]).text().trim(),
-                    vainqueur: $(cols[6]).text().trim(),
-                    finaliste: $(cols[7]).text().trim(),
-                    score: $(cols[8])?.text().trim() || ''
-                });
+        const tableauResultats = $(tableaux[1]);
+        const listeTournois = [];
+
+        tableauResultats.find('tbody tr').each((index, ligne) => {
+            const colonnes = $(ligne).find('td');
+
+            if (colonnes.length >= 8) {
+                const numeroTournoi = $(colonnes[0]).text().trim();
+                const dateTournoi = $(colonnes[1]).text().trim();
+                const nomEtVille = $(colonnes[2]).text().trim();
+                const typeCategorie = $(colonnes[3]).text().trim();
+                const typeSurface = $(colonnes[4]).text().trim();
+                const montantDotation = $(colonnes[5]).text().trim();
+                const nomVainqueur = $(colonnes[6]).text().trim();
+                const nomFinaliste = $(colonnes[7]).text().trim();
+                const resultatScore = $(colonnes[8])?.text().trim() || '';
+
+                const tournoi = {
+                    numero: numeroTournoi,
+                    date: dateTournoi,
+                    nomEtLieu: nomEtVille,
+                    categorie: typeCategorie,
+                    surface: typeSurface,
+                    dotation: montantDotation,
+                    vainqueur: nomVainqueur,
+                    finaliste: nomFinaliste,
+                    score: resultatScore
+                };
+
+                listeTournois.push(tournoi);
             }
         });
 
-        // 4. Sauvegarde dans un fichier JSON en local
-        await saveTournamentsToFile(tournaments);
-        
-        console.log('Tournois ATP 2025 extraits et sauvegardés avec succès!');
-        return tournaments;
+        await sauvegarderTournois(listeTournois);
+        console.log('Tournois ATP 2025 extraits et sauvegardés avec succès !');
 
-    } catch (error) {
-        console.error('Erreur:', error);
+        return listeTournois;
+
+    } catch (erreur) {
+        console.error('Une erreur est survenue :', erreur);
         return [];
     }
 }
 
-async function saveTournamentsToFile(tournaments) {
+// Fonction pour sauvegarder les données extraites
+async function sauvegarderTournois(donnees) {
     try {
-        // Chemin local sans utiliser path.join
-        const filePath = 'C:/Users/franc/Bureau/IT/Courses/3NJS/03NDJS-2025/Day-2/exo/scraper/tournois_atp_2025.json';
-        
-        const jsonData = JSON.stringify(tournaments, null, 2);
-        
-        // Utilisation de fs.promises.writeFile au lieu de writeFile direct
-        await fs.promises.writeFile(filePath, jsonData, 'utf-8');
-        console.log(`Données sauvegardées dans ${filePath}`);
-    } catch (err) {
-        console.error('Erreur lors de la sauvegarde:', err);
-        throw err;
+        const cheminFichier = 'C:/Users/franc/Bureau/IT/Courses/3NJS/03NDJS-2025/Day-2/exo/scraper/tournois_atp_2025.json';
+        const contenuJSON = JSON.stringify(donnees, null, 2);
+        await fs.promises.writeFile(cheminFichier, contenuJSON, 'utf-8');
+        console.log(`Fichier enregistré : ${cheminFichier}`);
+    } catch (e) {
+        console.error('Échec lors de l’écriture du fichier :', e);
+        throw e;
     }
 }
 
-// Exécution
-async function main() {
-    await extractATPTournaments2025();
-  }
-  main()
+// Lancer la récupération
+async function lancerExtraction() {
+    await collectTournoisATP2025();
+}
+lancerExtraction();
