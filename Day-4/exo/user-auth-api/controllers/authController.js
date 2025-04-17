@@ -9,7 +9,8 @@ exports.register = async (req, res) => {
     const { email, password } = req.body;
 
     // Check if user already exists
-    if (User.findByEmail(email)) {
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
@@ -17,7 +18,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const user = User.create({
+    const user = await User.create({
       email,
       password: hashedPassword
     });
@@ -36,7 +37,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user
-    const user = User.findByEmail(email);
+    const user = await User.findByEmail(email);
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -58,14 +59,19 @@ exports.login = async (req, res) => {
 
 exports.getMe = (req, res) => {
   try {
-    // User is attached to request by auth middleware
+    console.log("Utilisateur attaché à req :", req.user);
+
     const user = req.user;
-    
-    // Remove password before sending response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found in request' });
+    }
+
     const { password, ...userWithoutPassword } = user;
-    
     res.json(userWithoutPassword);
   } catch (error) {
+    console.error("Erreur dans getMe :", error.message);
     res.status(500).json({ message: 'Error fetching user' });
   }
 };
+
+

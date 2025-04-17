@@ -1,12 +1,16 @@
+// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
 const { authenticate } = require('../middleware/authMiddleware');
+const { getAllUsers, deleteUser } = require('../controllers/userController');
 
-// Get all users (protected)
-router.get('/', authenticate, userController.getAllUsers);
+// Toutes ces routes exigent un token valide
+router.use(authenticate);
 
-// Delete user (protected)
-router.delete('/:id', authenticate, userController.deleteUser);
+// GET /api/users
+router.get('/', getAllUsers);
+
+// DELETE /api/users/:id
+router.delete('/:id', deleteUser);
 
 module.exports = router;

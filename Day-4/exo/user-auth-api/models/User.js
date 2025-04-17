@@ -12,6 +12,8 @@ class User {
   static create(userData) {
     const user = { id: Date.now().toString(), ...userData };
     users.push(user);
+    console.log("Utilisateur créé :", user);
+    console.log("Tous les utilisateurs actuels :", users);
     return user;
   }
 
