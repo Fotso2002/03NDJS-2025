@@ -1,36 +1,8 @@
-const users = [];
+const mongoose = require('mongoose');
 
-class User {
-  static findByEmail(email) {
-    return users.find(user => user.email === email);
-  }
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
 
-  static findById(id) {
-    return users.find(user => user.id === id);
-  }
-
-  static create(userData) {
-    const user = { id: Date.now().toString(), ...userData };
-    users.push(user);
-    console.log("Utilisateur créé :", user);
-    console.log("Tous les utilisateurs actuels :", users);
-    return user;
-  }
-
-  static getAll() {
-    return users.map(user => {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    });
-  }
-
-  static delete(id) {
-    const index = users.findIndex(user => user.id === id);
-    if (index !== -1) {
-      return users.splice(index, 1)[0];
-    }
-    return null;
-  }
-}
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

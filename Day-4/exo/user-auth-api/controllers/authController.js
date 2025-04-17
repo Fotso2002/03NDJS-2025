@@ -2,76 +2,48 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const JWT_SECRET = 'your-secret-key'; 
+const JWT_SECRET = 'your-secret-key';
 
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-    // Check if user already exists
-    const existingUser = await User.findByEmail(email);
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ email, password: hashedPassword });
 
-    // Create user
-    const user = await User.create({
-      email,
-      password: hashedPassword
-    });
-
-    // Remove password before sending response
-    const { password: _, ...userWithoutPassword } = user;
-
+    const { password: _, ...userWithoutPassword } = newUser.toObject();
     res.status(201).json(userWithoutPassword);
-  } catch (error) {
-    res.status(500).json({ message: 'Error registering user' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error registering user', error: err.message });
   }
 };
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
-    // Find user
-    const user = await User.findByEmail(email);
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    // Create token
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Error logging in' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error logging in', error: err.message });
   }
 };
 
-exports.getMe = (req, res) => {
+exports.getMe = async (req, res) => {
   try {
-    console.log("Utilisateur attaché à req :", req.user);
+    const { userId } = req.user;
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const user = req.user;
-    if (!user) {
-      return res.status(404).json({ message: 'User not found in request' });
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
-  } catch (error) {
-    console.error("Erreur dans getMe :", error.message);
-    res.status(500).json({ message: 'Error fetching user' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user', error: err.message });
   }
 };
-
-

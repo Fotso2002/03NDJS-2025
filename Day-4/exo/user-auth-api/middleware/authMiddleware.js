@@ -1,31 +1,15 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-
-const JWT_SECRET = 'your-secret-key'; // Doit être le même partout
+const JWT_SECRET = 'your-secret-key';
 
 exports.authenticate = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log("Token reçu :", token);
-
-    if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
-    }
-
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log("Token décodé :", decoded);
-
-    const user = User.findById(decoded.userId);
-    console.log("Utilisateur trouvé par ID :", user);
-
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-
-    req.user = user;
+    req.user = decoded;
     next();
-  } catch (error) {
-    console.error("Erreur dans le middleware auth :", error.message);
+  } catch (err) {
     res.status(401).json({ message: 'Token is not valid' });
   }
 };
